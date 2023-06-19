@@ -1,8 +1,5 @@
 from models import Restaurant, RestaurantPizza, Pizza
 from app import app, db
-from flask import request
-import json
-import os
 from faker import Faker
 
 
@@ -17,8 +14,7 @@ class TestApp:
                 name=fake.name(), address=fake.address())
             restaurant2 = Restaurant(
                 name=fake.name(), address=fake.address())
-            db.session.add(restaurant1)
-            db.session.add(restaurant2)
+            db.session.add_all([restaurant1, restaurant2])
             db.session.commit()
 
             restaurants = Restaurant.query.all()
@@ -50,8 +46,10 @@ class TestApp:
             assert response.status_code == 200
             assert response.content_type == 'application/json'
             response = response.json
+            assert response['id'] == restaurant.id
             assert response['name'] == restaurant.name
             assert response['address'] == restaurant.address
+            assert 'restaurant_pizzas' in response
 
     def test_returns_404_if_no_restaurant_to_get(self):
         '''returns an error message and 404 status code with GET request to /restaurants/<int:id> by a non-existent ID.'''
@@ -79,7 +77,7 @@ class TestApp:
 
             result = Restaurant.query.filter(
                 Restaurant.id == restaurant.id).one_or_none()
-            assert not result
+            assert result is None
 
     def test_returns_404_if_no_restaurant_to_delete(self):
         '''returns an error message and 404 status code with DELETE request to /restaurants/<int:id> by a non-existent ID.'''
@@ -96,8 +94,7 @@ class TestApp:
             pizza1 = Pizza(name=fake.name(), ingredients=fake.sentence())
             pizza2 = Pizza(name=fake.name(), ingredients=fake.sentence())
 
-            db.session.add(pizza1)
-            db.session.add(pizza2)
+            db.session.add_all([pizza1, pizza2])
             db.session.commit()
 
             response = app.test_client().get('/pizzas')
@@ -179,7 +176,7 @@ class TestApp:
             )
 
             assert response.status_code == 400
-            assert response.json['errors']
+            assert response.json['errors'] == ["validation errors"]
 
             response = app.test_client().post(
                 '/restaurant_pizzas',
@@ -191,4 +188,4 @@ class TestApp:
             )
 
             assert response.status_code == 400
-            assert response.json['errors']
+            assert response.json['errors'] == ["validation errors"]
