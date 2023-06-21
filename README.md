@@ -27,6 +27,9 @@ Select `Upload Files`, navigate to this repo folder, and select
 
 ## Setup
 
+The instructions assume you changed into the `code-challenge` folder **prior**
+to opening the code editor.
+
 To download the dependencies for the frontend and backend, run:
 
 ```console
