@@ -58,3 +58,4 @@ class RestaurantPizza(db.Model):
             "restaurant_id": self.restaurant_id,
             "pizza_id": self.pizza_id
         }
+# final
